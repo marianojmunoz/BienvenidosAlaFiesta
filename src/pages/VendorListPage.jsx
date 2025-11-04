@@ -5,6 +5,7 @@ import { getVendorsByCategory } from '../services/vendorService';
 import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Paper, Button, IconButton, Divider, Stack } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import LocationSelector from '/src/components/LocationSelector.jsx';
 
 function VendorListPage() {
   const { category } = useParams();
@@ -12,46 +13,64 @@ function VendorListPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Default to a central location if none is provided.
+  const [/*location*/, setLocation] = useState({ lat: 40.7128, lng: -74.0060, address: 'New York, NY' });
+
   useEffect(() => {
-    if (typeof category === 'string' && category) {
+    if (category) {
       const fetchVendors = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          const data = await getVendorsByCategory(category);
-          setVendors(data);
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
-      };
+      if (!category) return;
+
+      setLoading(true);
+      setError(null);
+      try {
+        // Here you can decide whether to use getVendorsByCategory or getVendorsNearLocation
+        // We'll switch back to getVendorsByCategory for now to prevent the page from crashing,
+        // as getVendorsNearLocation is not yet implemented.
+        const data = await getVendorsByCategory(category);
+        setVendors(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
       fetchVendors();
     } else {
       // If there's no category, ensure we aren't stuck in a loading state.
       setLoading(false);
     }
+    // Only re-run the effect if the category changes.
   }, [category]);
 
-  const pageTitle = category ? category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Vendors';
 
-  if (loading) {
-    return <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}><CircularProgress /></Box>;
+  const pageTitle = category ? category.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) : 'Vendors';
+
+  // If there's no category, don't attempt to render the rest of the page.
+  if (!category) {
+    return <Alert severity="warning">No category selected. Please go back to the homepage and select a category.</Alert>;
   }
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-        <IconButton component={RouterLink} to="/" sx={{ mr: 2 }}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography variant="h3" component="h1">
-          {pageTitle}
-        </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton component={RouterLink} to="/" sx={{ mr: 2 }}>
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h3" component="h1">
+            {pageTitle}
+          </Typography>
+        </Box>
+        <LocationSelector onLocationChange={setLocation} />
       </Box>
 
       {error && <Alert severity="error" sx={{ mb: 3 }}>Error: {error}</Alert>}
+
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}><CircularProgress /></Box>
+      )}
 
       <Paper elevation={3}>
         <List disablePadding>
