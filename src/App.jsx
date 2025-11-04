@@ -34,7 +34,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/vendors/:category" element={<VendorListPage />} />
+          <Route path="/proveedores/:category" element={<VendorListPage />} />
         </Routes>
       </Router>
     </ThemeProvider>

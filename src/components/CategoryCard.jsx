@@ -22,7 +22,7 @@ function CategoryCard({ category }) {
         }}
       >
         <CardActionArea
-          component={RouterLink} to={`/vendors/${category.url}`}
+          component={RouterLink} to={`/proveedores/${category.url}`}
           sx={{
             display: 'flex',
             flexDirection: 'column',

@@ -24,13 +24,14 @@ const createVendor = (id, category, name, extras = []) => ({
 });
 
 export const vendors = {
-  venues: [createVendor(1, 'Venues', 'Grand'), createVendor(2, 'Venues', 'Modern')],
-  'lunch-services': [createVendor(3, 'Lunch Services', 'Gourmet'), createVendor(4, 'Lunch Services', 'Casual')],
-  photographers: [createVendor(5, 'Photographers', 'Candid'), createVendor(6, 'Photographers', 'Artistic')],
-  'decoration-services': [createVendor(7, 'Decoration Services', 'Elegant'), createVendor(8, 'Decoration Services', 'Boho')],
-  seamstresses: [createVendor(9, 'Seamstresses', 'Classic'), createVendor(10, 'Seamstresses', 'Haute Couture')],
-  'dj-services': [createVendor(11, 'DJ Services', 'Top 40'), createVendor(12, 'DJ Services', 'Vinyl')],
-  'cocktail-bar-services': [createVendor(13, 'Cocktail Bar Services', 'Mixology'), createVendor(14, 'Cocktail Bar Services', 'Tiki')],
-  'private-security-services': [createVendor(15, 'Private Security Services', 'Stealth'), createVendor(16, 'Private Security Services', 'Visible')],
-  'party-favor-services': [createVendor(17, 'Party Favor Services', 'Custom'), createVendor(18, 'Party Favor Services', 'Sweet Treats')],
+  'Salones': [createVendor(1, 'Salon', 'Grand'), createVendor(2, 'Salon', 'Modern')],
+  'servicios-de-lunch': [createVendor(3, 'Servicio de Lunch', 'Gourmet'), createVendor(4, 'Servicio de Lunch', 'Casual')],
+  'fotografia': [createVendor(5, 'Fotografía', 'Candid'), createVendor(6, 'Fotografía', 'Artistic')],
+  'servicios-de-decoracion': [createVendor(7, 'Decoración', 'Elegant'), createVendor(8, 'Decoración', 'Boho')],
+  'modistas': [createVendor(9, 'Modistas', 'Classic'), createVendor(10, 'Modistas', 'Haute Couture')],
+  'servicios-dj': [createVendor(11, 'Servicios de DJ', 'Top 40'), createVendor(12, 'Servicios de DJ', 'Vinyl')],
+  'servicios-barras-tragos': [createVendor(13, 'Barras de Tragos', 'Mixology'), createVendor(14, 'Barras de Tragos', 'Tiki')],
+  'servicios-seguridad-privada': [createVendor(15, 'Seguridad Privada', 'Stealth'), createVendor(16, 'Seguridad Privada', 'Visible')],
+  'servicios-cotillon': [createVendor(17, 'Cotillón', 'Custom'), createVendor(18, 'Cotillón', 'Sweet Treats')],
+  'batucadas': [createVendor(19, 'Batucada', 'Samba'), createVendor(20, 'Batucada', 'Fusion')],
 };

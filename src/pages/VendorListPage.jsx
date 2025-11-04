@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import { getVendorsByCategory } from '../services/vendorService';
+import { categories } from '../data/categories';
 import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Paper, Button, IconButton, Divider, Stack } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -45,7 +46,9 @@ function VendorListPage() {
   }, [category]);
 
 
-  const pageTitle = category ? category.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) : 'Vendors';
+  // Find the category object from our data to get the proper name for the title
+  const categoryDetails = categories.find(c => c.url === category);
+  const pageTitle = categoryDetails ? categoryDetails.name : 'Proveedores';
 
   // If there's no category, don't attempt to render the rest of the page.
   if (!category) {
@@ -104,7 +107,7 @@ function VendorListPage() {
               </React.Fragment>
             ))
           ) : (
-            !error && <ListItem><ListItemText primary={"No vendors found for this category."} /></ListItem>
+            !error && <ListItem><ListItemText primary={"No se encontraron proveedores para esta categoría."} /></ListItem>
           )}
         </List>
       </Paper>
