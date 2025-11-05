@@ -3,7 +3,7 @@ import React from 'react';
 
 import { Grid, Typography, Container, Box } from '@mui/material';
 import { categories } from '../data/categories';
-import CategoryCard from '../components/CategoryCard';
+import CategoryCard from '../components/layout/CategoryCard';
 
 function HomePage() {
   

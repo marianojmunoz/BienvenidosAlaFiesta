@@ -1,12 +1,12 @@
 // src/pages/CartPage.jsx
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { useCart } from '../CartContext';
+import { useCart } from './CartContext';
 import { Container, Typography, Box, List, ListItem, ListItemText, IconButton, Button, Paper, Divider} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PrintIcon from '@mui/icons-material/Print';
-import PrintPage from './PrintPage';
+import PrintPage from '../print/PrintPage';
 
 function CartPage() {
     const { cartItems, removeFromCart, removeCategoryFromCart, getCategoryForVendor } = useCart();

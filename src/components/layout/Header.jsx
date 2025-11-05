@@ -2,7 +2,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import CartIcon from './CartIcon';
+import CartIcon from '../../features/cart/CartIcon';
 
 function Header() {
   return (

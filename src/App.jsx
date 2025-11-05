@@ -2,11 +2,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
-import CartPage from './pages/CartPage';
-import VendorListPage from './pages/VendorListPage';
-import Header from './Header';
+import CartPage from './features/cart/CartPage';
+import VendorListPage from './features/vendors/VendorListPage';
+import Header from './components/layout/Header';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import { CartProvider } from './CartContext';
+import { CartProvider } from './features/cart/CartContext';
 
 const theme = createTheme({
   palette: {
