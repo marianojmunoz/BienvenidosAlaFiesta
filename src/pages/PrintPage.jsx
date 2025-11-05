@@ -1,5 +1,5 @@
-// src/components/PrintPage.jsx
-import React from 'react';
+// src/features/print/PrintPage.jsx
+import React from "react";
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { useCart } from '../CartContext';
 
@@ -51,33 +51,29 @@ function PrintPage() {
           </Typography>
           <TableContainer component={Paper}>
             <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Proveedor</TableCell>
-                  <TableCell>Dirección</TableCell>
-                  <TableCell>Teléfono</TableCell>
-                  <TableCell>Email</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Object.entries(groupedByCategory).map(([category, vendors]) => (
-                  <React.Fragment key={category}>
-                    <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-                      <TableCell colSpan={4} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.08)' }}>
-                        <Typography variant="h6" component="div">{category}</Typography>
-                      </TableCell>
+              {Object.entries(groupedByCategory).map(([category, vendors]) => (
+                <TableBody key={category} sx={{ pageBreakInside: 'avoid' }}>
+                  <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                    <TableCell colSpan={4} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.08)', borderTop: '2px solid black' }}>
+                      <Typography variant="h6" component="div">{category}</Typography>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Proveedor</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Dirección</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Teléfono</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
+                  </TableRow>
+                  {vendors.map((vendor) => (
+                    <TableRow key={vendor.id}>
+                      <TableCell>{vendor.name}</TableCell>
+                      <TableCell>{vendor.address}</TableCell>
+                      <TableCell>{vendor.contact.phone}</TableCell>
+                      <TableCell>{vendor.contact.email}</TableCell>
                     </TableRow>
-                    {vendors.map((vendor) => (
-                      <TableRow key={vendor.id}>
-                        <TableCell>{vendor.name}</TableCell>
-                        <TableCell>{vendor.address}</TableCell>
-                        <TableCell>{vendor.contact.phone}</TableCell>
-                        <TableCell>{vendor.contact.email}</TableCell>
-                      </TableRow>
-                    ))}
-                  </React.Fragment>
-                ))}
-              </TableBody>
+                  ))}
+                </TableBody>
+              ))}
             </Table>
           </TableContainer>
         </Container>
