@@ -19,18 +19,45 @@ function LocationSelector({ onLocationChange }) {
     setError('');
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
-        // In a real app, you would use a geocoding service to get an address from lat/lng
-        const newLocation = {
-          lat: latitude,
-          lng: longitude,
-          address: `Your Location (${latitude.toFixed(2)}, ${longitude.toFixed(2)})`,
-        };
-        onLocationChange(newLocation);
-        setCurrentLocation(newLocation.address);
-        setManualLocation(''); // Clear manual input
-        setLoading(false);
+        try {
+          // Replace with your actual OpenCage API key
+          const apiKey = 'cd203c9e558746d0a0e592f57c2ab17d';
+          const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}&language=es&pretty=1`);
+          const data = await response.json();
+
+          let newLocation;
+          if (data.results && data.results.length > 0) {
+            const components = data.results[0].components;
+            const { city, town, village, state, province, county, country } = components;
+
+            const aCity = city || town || village;
+            const aState = province || state || county;
+            const address = [country,  aState, aCity ].filter(Boolean).join(', ');
+
+            newLocation = {
+              lat: latitude,
+              lng: longitude,
+              address: address || 'Current Location',
+            };
+          } else {
+            // Fallback if address components are not available
+            newLocation = { lat: latitude, lng: longitude, address: 'Current Location' };
+          }
+          onLocationChange(newLocation);
+          setCurrentLocation(newLocation.address);
+          setManualLocation(''); // Clear manual input
+        } catch (error) {
+          console.error("Error during reverse geocoding:", error);
+          setError('Could not fetch address for your location.');
+          // Fallback to coordinates on error
+          const fallbackLocation = { lat: latitude, lng: longitude, address: `${latitude.toFixed(2)}, ${longitude.toFixed(2)}` };
+          onLocationChange(fallbackLocation);
+          setCurrentLocation(fallbackLocation.address);
+        } finally {
+          setLoading(false);
+        }
       },
       () => {
         setError('Unable to retrieve your location.');
