@@ -32,6 +32,7 @@ const theme = createTheme({
 
 function App() {
   const [location, setLocation] = useState({ lat: 40.7128, lng: -74.0060, address: 'New York, NY' });
+  const [radius, setRadius] = useState(10); // Default radius in km
 
   return (
     <CartProvider location={location}>
@@ -42,10 +43,10 @@ function App() {
             <Header />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Routes>
-                <Route path="/" element={<HomePage onLocationChange={setLocation} />} />
+                <Route path="/" element={<HomePage onLocationChange={setLocation} onRadiusChange={setRadius} radius={radius} />} />
                 <Route
                   path="/proveedores/:category"
-                  element={<VendorListPage location={location} />}
+                  element={<VendorListPage location={location} radius={radius} />}
                 />
                 <Route path="/cart" element={<CartPage />} />
               </Routes>

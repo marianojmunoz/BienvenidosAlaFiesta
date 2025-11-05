@@ -12,7 +12,7 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 
 export const categories = [
-  { name: 'Salones', url: 'Salones', icon: React.createElement(MeetingRoomIcon, { sx: { fontSize: 40 } }) },
+  { name: 'Salones para Eventos', url: 'salones-para-eventos', icon: React.createElement(MeetingRoomIcon, { sx: { fontSize: 40 } }) },
   { name: 'Servicios de Lunch', url: 'servicios-de-lunch', icon: React.createElement(FastfoodIcon, { sx: { fontSize: 40 } }) },
   { name: 'Fotografía', url: 'fotografia', icon: React.createElement(CameraAltIcon, { sx: { fontSize: 40 } }) },
   { name: 'Decoración', url: 'servicios-de-decoracion', icon: React.createElement(FilterVintageIcon, { sx: { fontSize: 40 } }) },

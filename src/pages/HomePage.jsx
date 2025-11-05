@@ -6,7 +6,7 @@ import { categories } from '../data/categories';
 import LocationSelector from '../components/layout/LocationSelector';
 import CategoryCard from '../components/layout/CategoryCard';
 
-function HomePage({ onLocationChange }) {
+function HomePage({ onLocationChange, onRadiusChange, radius }) {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ textAlign: 'center', mb: 4 }}>
@@ -19,7 +19,7 @@ function HomePage({ onLocationChange }) {
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 6 }}>
-        <LocationSelector onLocationChange={onLocationChange} />
+        <LocationSelector onLocationChange={onLocationChange} onRadiusChange={onRadiusChange} radius={radius} />
       </Box>
 
       <Grid container spacing={4}>

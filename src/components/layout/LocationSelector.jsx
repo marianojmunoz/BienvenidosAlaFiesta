@@ -1,13 +1,17 @@
 // src/components/LocationSelector.jsx
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, CircularProgress } from '@mui/material';
+import { Box, Button, TextField, Typography, CircularProgress, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 
-function LocationSelector({ onLocationChange }) {
+function LocationSelector({ onLocationChange, onRadiusChange, radius }) {
   const [manualLocation, setManualLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [currentLocation, setCurrentLocation] = useState('');
+
+  const handleRadiusChange = (event) => {
+    onRadiusChange(event.target.value);
+  };
 
   const handleGeolocate = () => {
     if (!navigator.geolocation) {
@@ -97,6 +101,22 @@ function LocationSelector({ onLocationChange }) {
           <TextField label="Enter a location" variant="outlined" size="small" value={manualLocation} onChange={(e) => setManualLocation(e.target.value)} />
           <Button type="submit" variant="contained">Search</Button>
         </form>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel id="radius-select-label">Radius</InputLabel>
+          <Select
+            labelId="radius-select-label"
+            id="radius-select"
+            value={radius}
+            label="Radius"
+            onChange={handleRadiusChange}
+          >
+            <MenuItem value={5}>5 km</MenuItem>
+            <MenuItem value={10}>10 km</MenuItem>
+            <MenuItem value={15}>15 km</MenuItem>
+            <MenuItem value={25}>25 km</MenuItem>
+            <MenuItem value={50}>50 km</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
       {error && <Typography color="error" variant="body2" sx={{ mt: 1 }}>{error}</Typography>}
       {currentLocation && <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>Searching near: {currentLocation}</Typography>}

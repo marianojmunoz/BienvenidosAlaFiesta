@@ -9,7 +9,7 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCart } from '../cart/CartContext';
 
-function VendorListPage({ location }) {
+function VendorListPage({ location, radius }) {
   const { category } = useParams();
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,7 @@ function VendorListPage({ location }) {
       setLoading(false);
     }
     // Only re-run the effect if the category changes.
-  }, [category, location]);
+  }, [category, location, radius]);
 
 
   // Find the category object from our data to get the proper name for the title

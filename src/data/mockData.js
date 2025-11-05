@@ -25,7 +25,7 @@ const createVendor = (id, category, name, extras = []) => ({
 });
 
 export const vendors = {
-  'Salones': [createVendor(1, 'Salon', 'Grand'), createVendor(2, 'Salon', 'Modern')],
+  'salones-para-eventos': [createVendor(1, 'Salon', 'Grand'), createVendor(2, 'Salon', 'Modern')],
   'servicios-de-lunch': [createVendor(3, 'Servicio de Lunch', 'Gourmet'), createVendor(4, 'Servicio de Lunch', 'Casual')],
   'fotografia': [createVendor(5, 'Fotografía', 'Candid'), createVendor(6, 'Fotografía', 'Artistic')],
   'servicios-de-decoracion': [createVendor(7, 'Decoración', 'Elegant'), createVendor(8, 'Decoración', 'Boho')],
