@@ -2,6 +2,7 @@
 const createVendor = (id, category, name, extras = []) => ({
   id,
   name: `${name} ${category}`,
+  category: category, // Add the category property here
   address: `${120 + id} Almafuerte, Paraná, Entre Rios`,
   contact: {
     phone: '555-010' + id,

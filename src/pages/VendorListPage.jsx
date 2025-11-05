@@ -5,8 +5,10 @@ import { getVendorsByCategory } from '../services/vendorService';
 import { categories } from '../data/categories';
 import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Paper, Button, IconButton, Divider, Stack } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocationSelector from '/src/components/LocationSelector.jsx';
+import { useCart } from '../CartContext';
 
 function VendorListPage() {
   const { category } = useParams();
@@ -14,6 +16,7 @@ function VendorListPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const { addToCart, cartItems } = useCart();
   // Default to a central location if none is provided.
   const [/*location*/, setLocation] = useState({ lat: 40.7128, lng: -74.0060, address: 'New York, NY' });
 
@@ -93,6 +96,16 @@ function VendorListPage() {
                         aria-label={`View ${vendor.name} on map`}
                       >
                         Mapa
+                      </Button>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<AddShoppingCartIcon />}
+                        onClick={() => addToCart(vendor)}
+                        disabled={cartItems.some(item => item.id === vendor.id)}
+                        aria-label={`Add ${vendor.name} to cart`}
+                      >
+                        Añadir
                       </Button>
                     </Stack>
                   }
