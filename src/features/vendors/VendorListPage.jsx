@@ -7,18 +7,15 @@ import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, Li
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import LocationSelector from '/src/components/layout/LocationSelector.jsx';
 import { useCart } from '../cart/CartContext';
 
-function VendorListPage() {
+function VendorListPage({ location }) {
   const { category } = useParams();
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const { addToCart, cartItems } = useCart();
-  // Default to a central location if none is provided.
-  const [/*location*/, setLocation] = useState({ lat: 40.7128, lng: -74.0060, address: 'New York, NY' });
 
   useEffect(() => {
     if (category) {
@@ -46,7 +43,7 @@ function VendorListPage() {
       setLoading(false);
     }
     // Only re-run the effect if the category changes.
-  }, [category]);
+  }, [category, location]);
 
 
   // Find the category object from our data to get the proper name for the title
@@ -69,7 +66,6 @@ function VendorListPage() {
             {pageTitle}
           </Typography>
         </Box>
-        <LocationSelector onLocationChange={setLocation} />
       </Box>
 
       {error && <Alert severity="error" sx={{ mb: 3 }}>Error: {error}</Alert>}
