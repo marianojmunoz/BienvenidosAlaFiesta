@@ -1,9 +1,8 @@
 // src/pages/VendorListPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
-import { getVendorsByCategory } from '../../services/vendorService';
 import { categories } from '../../data/categories';
-import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Paper, Button, IconButton, Divider, Stack } from '@mui/material';
+import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Paper, Button, IconButton, Divider, Stack, Rating } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -17,18 +16,18 @@ function VendorListPage({ location, radius }) {
 
   const { addToCart, cartItems } = useCart();
 
+  // Find the category object from our data to get the proper name for the title
+  const categoryDetails = categories.find(c => c.url === category);
+  const pageTitle = categoryDetails ? categoryDetails.name : 'Proveedores';
+
   useEffect(() => {
     if (category) {
       const fetchVendors = async () => {
-      if (!category) return;
-
-      setLoading(true);
-      setError(null);
-      try {
-        // Here you can decide whether to use getVendorsByCategory or getVendorsNearLocation
-        // We'll switch back to getVendorsByCategory for now to prevent the page from crashing,
-        // as getVendorsNearLocation is not yet implemented.
-        const data = await getVendorsByCategory(category);
+        setLoading(true);
+        setError(null);
+        try {
+          // Construct the search term based on category and location
+          const data = await searchGooglePlaces(pageTitle, location, radius);
         setVendors(data);
       } catch (err) {
         setError(err.message);
@@ -43,12 +42,40 @@ function VendorListPage({ location, radius }) {
       setLoading(false);
     }
     // Only re-run the effect if the category changes.
-  }, [category, location, radius]);
+  }, [category, location, radius, pageTitle]);
+
+  const searchGooglePlaces = async (keyword, location, radiusInKm) => {
+    // IMPORTANT: Replace with your actual Google Places API key.
+    // For production, this key should be stored securely on a backend server.
+    const apiKey = import.meta.env.VITE_GOOGLE_PLACES_API_KEY;
+    const radiusInMeters = radiusInKm * 1000;
+    const locationString = `${location.lat},${location.lng}`;
+
+    // Note: The Google Places API requires a proxy to be called from the browser to avoid CORS issues.
+    // Using a public proxy is ONLY for development and is not reliable. A proper backend proxy is required for production.
+    const proxyUrl = 'https://corsproxy.io/?';
+    const targetUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${locationString}&radius=${radiusInMeters}&keyword=${encodeURIComponent(keyword)}&key=${apiKey}`;
+    const url = `${proxyUrl}${encodeURIComponent(targetUrl)}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status !== 'OK') {
+      throw new Error(`Google Places API Error: ${data.status} - ${data.error_message || ''}`);
+    }
+
+    // Map the API results to the format your application expects
+    return data.results.map(place => ({
+      id: place.place_id,
+      name: place.name,
+      // 'vicinity' provides a simplified address (street, city).
+      address: place.vicinity,
+      rating: place.rating || 0,
+      category: pageTitle, // Assign the current category
+    })).slice(0, 25); // Limit to 25 results
+  };
 
 
-  // Find the category object from our data to get the proper name for the title
-  const categoryDetails = categories.find(c => c.url === category);
-  const pageTitle = categoryDetails ? categoryDetails.name : 'Proveedores';
 
   // If there's no category, don't attempt to render the rest of the page.
   if (!category) {
@@ -108,7 +135,16 @@ function VendorListPage({ location, radius }) {
                 >
                   <ListItemText
                     primary={vendor.name}
-                    secondary={vendor.address}
+                    secondary={
+                      <>
+                        <Typography component="span" variant="body2" color="text.primary" display="block">
+                          {vendor.address}
+                        </Typography>
+                        {vendor.rating > 0 && (
+                          <Rating name="read-only" value={vendor.rating} precision={0.5} readOnly size="small" />
+                        )}
+                      </>
+                    }
                     primaryTypographyProps={{ variant: 'h6', component: 'p' }}
                   />
                 </ListItem>

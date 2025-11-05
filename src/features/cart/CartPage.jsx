@@ -81,15 +81,7 @@ function CartPage() {
                   >
                     <ListItemText
                       primary={vendor.name}
-                      secondary={
-                        <>
-                          <Typography component="span" variant="body2" color="text.primary">
-                            {vendor.address}
-                          </Typography>
-                          <br />
-                          Contacto: {vendor.contact.phone} | {vendor.contact.email}
-                        </>
-                      }
+                      secondary={vendor.address}
                     />
                   </ListItem>
                   {index < vendors.length - 1 && <Divider component="li" />}

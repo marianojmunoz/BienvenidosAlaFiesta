@@ -59,17 +59,13 @@ function PrintPage() {
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Proveedor</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Dirección</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Teléfono</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Proveedor</TableCell> 
+                    <TableCell sx={{ fontWeight: 'bold' }}>Dirección</TableCell> 
                   </TableRow>
                   {vendors.map((vendor) => (
                     <TableRow key={vendor.id}>
                       <TableCell>{vendor.name}</TableCell>
                       <TableCell>{vendor.address}</TableCell>
-                      <TableCell>{vendor.contact.phone}</TableCell>
-                      <TableCell>{vendor.contact.email}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
