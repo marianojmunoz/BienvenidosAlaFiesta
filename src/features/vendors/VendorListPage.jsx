@@ -1,44 +1,70 @@
 // src/pages/VendorListPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
-import { getVendorsByCategory } from '../../services/vendorService';
 import { categories } from '../../data/categories';
-import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Paper, Button, IconButton, Divider, Stack } from '@mui/material';
+import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Paper, Button, IconButton, Divider, Stack, Rating } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import LocationSelector from '/src/components/layout/LocationSelector.jsx';
 import { useCart } from '../cart/CartContext';
 
-function VendorListPage() {
+function VendorListPage({ location, radius }) {
   const { category } = useParams();
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const { addToCart, cartItems } = useCart();
-  // Default to a central location if none is provided.
-  const [/*location*/, setLocation] = useState({ lat: 40.7128, lng: -74.0060, address: 'New York, NY' });
+
+  // Find the category object from our data to get the proper name for the title
+  const categoryDetails = categories.find(c => c.url === category);
+  const pageTitle = categoryDetails ? categoryDetails.name : 'Proveedores';
+
+  const searchSerperPlaces = useCallback(async (keyword, searchLocation, searchRadius) => {
+    // No need for API key on the client-side when using a proxy
+
+    if (!searchLocation || !searchLocation.lat || !searchLocation.lng) {
+      console.error("Location data is incomplete for search.");
+      throw new Error("La configuración para buscar proveedores no está completa. Por favor, contacta al administrador.");
+    }
+
+    const locationQuery = searchLocation.address || `${searchLocation.lat},${searchLocation.lng}`;
+    const url = `https://api.serper.dev/search`;
+    const categoryMap = { "Pastelerias": "bakery", "Salones de fiesta": "event venue" };
+    const baseQuery = categoryMap[keyword] || keyword;
+    const serperQuery = `${baseQuery} within ${searchRadius}km`;
+
+    // Call your backend proxy instead of the Serper API directly
+    const proxyUrl = `http://localhost:3001/api/search-vendors`; // Adjust port if your backend is different
+    const response = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        // The API key is now sent by the proxy server, so it's removed from the client-side call.
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ q: serperQuery, location: locationQuery, type: "places", num: 25 })
+    });
+
+    const data = await response.json();
+    if (!response.ok || data.error) throw new Error(`Proxy Error: ${data.error || response.statusText}`);
+    return (data.places || []).map(place => ({ id: place.place_id, name: place.title, address: place.address, geocodes: { latitude: place.latitude, longitude: place.longitude }, rating: place.rating || 0, category: keyword })).slice(0, 25);
+  }, []);
 
   useEffect(() => {
     if (category) {
       const fetchVendors = async () => {
-      if (!category) return;
-
-      setLoading(true);
-      setError(null);
-      try {
-        // Here you can decide whether to use getVendorsByCategory or getVendorsNearLocation
-        // We'll switch back to getVendorsByCategory for now to prevent the page from crashing,
-        // as getVendorsNearLocation is not yet implemented.
-        const data = await getVendorsByCategory(category);
-        setVendors(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+        setLoading(true);
+        setError(null);
+        try {
+          const data = await searchSerperPlaces(pageTitle, location, radius);
+          setVendors(data);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
 
       fetchVendors();
     } else {
@@ -46,12 +72,7 @@ function VendorListPage() {
       setLoading(false);
     }
     // Only re-run the effect if the category changes.
-  }, [category]);
-
-
-  // Find the category object from our data to get the proper name for the title
-  const categoryDetails = categories.find(c => c.url === category);
-  const pageTitle = categoryDetails ? categoryDetails.name : 'Proveedores';
+  }, [category, location, radius, pageTitle, searchSerperPlaces]);
 
   // If there's no category, don't attempt to render the rest of the page.
   if (!category) {
@@ -69,7 +90,6 @@ function VendorListPage() {
             {pageTitle}
           </Typography>
         </Box>
-        <LocationSelector onLocationChange={setLocation} />
       </Box>
 
       {error && <Alert severity="error" sx={{ mb: 3 }}>Error: {error}</Alert>}
@@ -112,7 +132,16 @@ function VendorListPage() {
                 >
                   <ListItemText
                     primary={vendor.name}
-                    secondary={vendor.address}
+                    secondary={
+                      <>
+                        <Typography component="span" variant="body2" color="text.primary" display="block">
+                          {vendor.address}
+                        </Typography>
+                        {vendor.rating > 0 && (
+                          <Rating name="read-only" value={vendor.rating} precision={0.5} readOnly size="small" />
+                        )}
+                      </>
+                    }
                     primaryTypographyProps={{ variant: 'h6', component: 'p' }}
                   />
                 </ListItem>

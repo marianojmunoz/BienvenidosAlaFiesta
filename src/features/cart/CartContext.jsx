@@ -5,7 +5,7 @@ const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
-export const CartProvider = ({ children }) => {
+export const CartProvider = ({ children, location }) => {
   const [cartItems, setCartItems] = useState([]);
 
   const addToCart = (vendor) => {
@@ -37,6 +37,7 @@ export const CartProvider = ({ children }) => {
     removeFromCart,
     removeCategoryFromCart,
     getCategoryForVendor,
+    location,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

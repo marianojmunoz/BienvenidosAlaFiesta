@@ -1,5 +1,5 @@
 // src/App.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import CartPage from './features/cart/CartPage';
@@ -31,8 +31,11 @@ const theme = createTheme({
 });
 
 function App() {
+  const [location, setLocation] = useState({ lat: 40.7128, lng: -74.0060, address: 'New York, NY' });
+  const [radius, setRadius] = useState(10); // Default radius in km
+
   return (
-    <CartProvider>
+    <CartProvider location={location}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
@@ -40,8 +43,11 @@ function App() {
             <Header />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/proveedores/:category" element={<VendorListPage />} />
+                <Route path="/" element={<HomePage onLocationChange={setLocation} onRadiusChange={setRadius} radius={radius} />} />
+                <Route
+                  path="/proveedores/:category"
+                  element={<VendorListPage location={location} radius={radius} />}
+                />
                 <Route path="/cart" element={<CartPage />} />
               </Routes>
             </div>

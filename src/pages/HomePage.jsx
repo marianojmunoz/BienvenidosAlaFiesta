@@ -1,26 +1,30 @@
 // src/pages/HomePage.jsx
 import React from 'react';
-
-import { Grid, Typography, Container, Box } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { Container, Typography, Grid, Box } from '@mui/material';
 import { categories } from '../data/categories';
+import LocationSelector from '../components/layout/LocationSelector';
 import CategoryCard from '../components/layout/CategoryCard';
 
-function HomePage() {
-  
- //const theme = useTheme();
+function HomePage({ onLocationChange, onRadiusChange, radius }) {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          Planea tu Fiesta Perfecta !!
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h2" component="h1" gutterBottom >
+          Planifica tu Fiesta Perfecta
         </Typography>
-        <Typography variant="h5" color="text.secondary">
-          Selecciona una categoría para encontrar los mejores proveedores cercanos.
+        <Typography variant="h5" color="text.secondary" paragraph>
+          Encuentra los mejores proveedores para tu evento. Comienza seleccionando tu ubicación y una categoría.
         </Typography>
       </Box>
+
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 6 }}>
+        <LocationSelector onLocationChange={onLocationChange} onRadiusChange={onRadiusChange} radius={radius} />
+      </Box>
+
       <Grid container spacing={4}>
         {categories.map((category) => (
-          <CategoryCard key={category.name} category={category} />
+          <CategoryCard key={category.id} category={category} />
         ))}
       </Grid>
     </Container>
