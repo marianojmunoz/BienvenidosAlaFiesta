@@ -146,7 +146,7 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
           <List disablePadding>
             {vendors.length > 0 ? (
               vendors.map((vendor, index) => (
-                <React.Fragment key={vendor.id}>
+                <React.Fragment key={`${vendor.id}-${index}`}>
                   <ListItem
                     secondaryAction={
                       <Stack direction="row" spacing={1}>
