@@ -1,5 +1,5 @@
 // src/pages/VendorListPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import { categories } from '../../data/categories';
 import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Paper, Button, IconButton, Divider, Stack, Rating } from '@mui/material';
@@ -20,21 +20,51 @@ function VendorListPage({ location, radius }) {
   const categoryDetails = categories.find(c => c.url === category);
   const pageTitle = categoryDetails ? categoryDetails.name : 'Proveedores';
 
+  const searchSerperPlaces = useCallback(async (keyword, searchLocation, searchRadius) => {
+    // No need for API key on the client-side when using a proxy
+
+    if (!searchLocation || !searchLocation.lat || !searchLocation.lng) {
+      console.error("Location data is incomplete for search.");
+      throw new Error("La configuración para buscar proveedores no está completa. Por favor, contacta al administrador.");
+    }
+
+    const locationQuery = searchLocation.address || `${searchLocation.lat},${searchLocation.lng}`;
+    const url = `https://api.serper.dev/search`;
+    const categoryMap = { "Pastelerias": "bakery", "Salones de fiesta": "event venue" };
+    const baseQuery = categoryMap[keyword] || keyword;
+    const serperQuery = `${baseQuery} within ${searchRadius}km`;
+
+    // Call your backend proxy instead of the Serper API directly
+    const proxyUrl = `http://localhost:3001/api/search-vendors`; // Adjust port if your backend is different
+    const response = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        // The API key is now sent by the proxy server, so it's removed from the client-side call.
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ q: serperQuery, location: locationQuery, type: "places", num: 25 })
+    });
+
+    const data = await response.json();
+    if (!response.ok || data.error) throw new Error(`Proxy Error: ${data.error || response.statusText}`);
+    return (data.places || []).map(place => ({ id: place.place_id, name: place.title, address: place.address, geocodes: { latitude: place.latitude, longitude: place.longitude }, rating: place.rating || 0, category: keyword })).slice(0, 25);
+  }, []);
+
   useEffect(() => {
     if (category) {
       const fetchVendors = async () => {
         setLoading(true);
         setError(null);
         try {
-          // Construct the search term based on category and location
-          const data = await searchGooglePlaces(pageTitle, location, radius);
-        setVendors(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+          const data = await searchSerperPlaces(pageTitle, location, radius);
+          setVendors(data);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
 
       fetchVendors();
     } else {
@@ -42,40 +72,7 @@ function VendorListPage({ location, radius }) {
       setLoading(false);
     }
     // Only re-run the effect if the category changes.
-  }, [category, location, radius, pageTitle]);
-
-  const searchGooglePlaces = async (keyword, location, radiusInKm) => {
-    // IMPORTANT: Replace with your actual Google Places API key.
-    // For production, this key should be stored securely on a backend server.
-    const apiKey = import.meta.env.VITE_GOOGLE_PLACES_API_KEY;
-    const radiusInMeters = radiusInKm * 1000;
-    const locationString = `${location.lat},${location.lng}`;
-
-    // Note: The Google Places API requires a proxy to be called from the browser to avoid CORS issues.
-    // Using a public proxy is ONLY for development and is not reliable. A proper backend proxy is required for production.
-    const proxyUrl = 'https://corsproxy.io/?';
-    const targetUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${locationString}&radius=${radiusInMeters}&keyword=${encodeURIComponent(keyword)}&key=${apiKey}`;
-    const url = `${proxyUrl}${encodeURIComponent(targetUrl)}`;
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (data.status !== 'OK') {
-      throw new Error(`Google Places API Error: ${data.status} - ${data.error_message || ''}`);
-    }
-
-    // Map the API results to the format your application expects
-    return data.results.map(place => ({
-      id: place.place_id,
-      name: place.name,
-      // 'vicinity' provides a simplified address (street, city).
-      address: place.vicinity,
-      rating: place.rating || 0,
-      category: pageTitle, // Assign the current category
-    })).slice(0, 25); // Limit to 25 results
-  };
-
-
+  }, [category, location, radius, pageTitle, searchSerperPlaces]);
 
   // If there's no category, don't attempt to render the rest of the page.
   if (!category) {
