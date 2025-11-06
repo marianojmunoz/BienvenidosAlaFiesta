@@ -35,18 +35,18 @@ function App() {
   const [radius, setRadius] = useState(10); // Default radius in km
 
   return (
-    <CartProvider location={location}>
+    <CartProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
           <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-            <Header />
+            <Header location={location} />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Routes>
                 <Route path="/" element={<HomePage onLocationChange={setLocation} onRadiusChange={setRadius} radius={radius} />} />
                 <Route
                   path="/proveedores/:category"
-                  element={<VendorListPage location={location} radius={radius} />}
+                  element={<VendorListPage location={location} radius={radius} onLocationChange={setLocation} onRadiusChange={setRadius} />}
                 />
                 <Route path="/cart" element={<CartPage />} />
               </Routes>
