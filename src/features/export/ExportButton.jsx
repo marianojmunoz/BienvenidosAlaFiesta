@@ -3,9 +3,9 @@ import { Button } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import { exportToExcel } from './exportUtils';
 
-const ExportButton = ({ data, filename, sheetName, transformData, disabled, ...props }) => {
+const ExportButton = ({ data, filename, sheetName, transformData, disabled, title, summary, ...props }) => {
   const handleExport = () => {
-    exportToExcel(data, filename, sheetName, transformData);
+    exportToExcel(data, filename, sheetName, transformData, title, summary);
   };
 
 const isDisabled = disabled || !data || data.length === 0;
