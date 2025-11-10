@@ -5,7 +5,9 @@ import HomePage from './pages/HomePage';
 import CartPage from './features/cart/CartPage';
 import VendorListPage from './features/vendors/VendorListPage';
 import Header from './components/layout/Header';
+import GuestListPage from './features/guestList/guestListPage';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { GuestListProvider } from './features/guestList/GuestListContext';
 import { CartProvider } from './features/cart/CartContext';
 
 const theme = createTheme({
@@ -16,7 +18,7 @@ const theme = createTheme({
     background: { default: '#f4f5f7' },
   },
   typography: {
-     fontFamily: 'Poppins, Roboto, Arial, sans-serif',
+    fontFamily: 'Poppins, Roboto, Arial, sans-serif',
     h1: { fontWeight: 700 },
     h2: { fontWeight: 700 },
     h3: { fontWeight: 600 },
@@ -36,24 +38,26 @@ function App() {
 
   return (
     <CartProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router>
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-            <Header location={location} />
-            <div style={{ flex: 1, overflowY: 'auto' }}>
-              <Routes>
-                <Route path="/" element={<HomePage onLocationChange={setLocation} onRadiusChange={setRadius} radius={radius} />} />
-                <Route
-                  path="/proveedores/:category"
-                  element={<VendorListPage location={location} radius={radius} onLocationChange={setLocation} onRadiusChange={setRadius} />}
-                />
-                <Route path="/cart" element={<CartPage />} />
-              </Routes>
+      <GuestListProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Router>
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+              <Header location={location} />
+              <div style={{ flex: 1, overflowY: 'auto' }}>
+                <Routes>
+                  <Route path="/" element={<HomePage onLocationChange={setLocation} onRadiusChange={setRadius} radius={radius} />} />
+                  <Route
+                    path="/proveedores/:category"
+                    element={<VendorListPage location={location} radius={radius} onLocationChange={setLocation} onRadiusChange={setRadius} />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/guest-list" element={<GuestListPage />} />
+                </Routes>
+              </div>
             </div>
-          </div>
-        </Router>
-      </ThemeProvider >
+          </Router>
+        </ThemeProvider >
+      </GuestListProvider>
     </CartProvider>
   );
 }
