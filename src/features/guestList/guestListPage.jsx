@@ -32,6 +32,12 @@ const GuestListPage = () => {
     setEditingCell({ id: null, field: null });
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleBlur();
+    }
+  };
+
   const handleDeleteClick = (id) => {
     setDeleteConfirm({ open: true, id });
   };
@@ -55,6 +61,7 @@ const GuestListPage = () => {
           value={guest[field]}
           onChange={(e) => handleEditChange(e, guest.id, field)}
           onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           autoFocus
           fullWidth
           type={field === 'qty' || field === 'table' || field === 'hasChildren' ? 'number' : 'text'}
@@ -69,9 +76,33 @@ const GuestListPage = () => {
     );
   };
 
+  const renderGuestType = (type) => {
+    const typeMap = {
+      Friend: 'Amigo/a',
+      Family: 'Familia',
+    };
+    return typeMap[type] || type;
+  };
+
+
   return (
-    <Box sx={{ padding: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+    <>
+      <style type="text/css" media="print">
+        {`
+          @page {
+            size: auto;
+          }
+        `}
+      </style>
+      <Box sx={{
+      padding: 3,
+      '@media print': {
+        padding: 0,
+        margin: 0,
+        overflow: 'visible'
+      }
+    }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, '@media print': { padding: '20px' } }}>
         <Typography variant="h4">
           Lista de Invitados
         </Typography>
@@ -83,6 +114,7 @@ const GuestListPage = () => {
                 variant="contained"
                 startIcon={<PrintIcon />}
                 onClick={handlePrint}
+                sx={{ '@media print': { display: 'none' } }}
             >
                 Print
             </Button>
@@ -90,7 +122,7 @@ const GuestListPage = () => {
       </Box>
 
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="guest list table">
+        <Table sx={{ minWidth: 650, '@media print': { minWidth: '100%' } }} aria-label="guest list table">
           <TableHead>
             <TableRow>
               <TableCell>Nombre completo</TableCell>
@@ -100,7 +132,7 @@ const GuestListPage = () => {
               <TableCell align="right">N° Mesa</TableCell>
               <TableCell>Tipo Invitado</TableCell>
               <TableCell align="center">Está aquí?</TableCell>
-              <TableCell align="center">Acción</TableCell>
+              <TableCell align="center" sx={{ '@media print': { display: 'none' } }}>Acción</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -124,16 +156,27 @@ const GuestListPage = () => {
                 <TableCell align="right" onDoubleClick={() => handleDoubleClick(guest.id, 'table')}>
                   {renderCell(guest, 'table')}
                 </TableCell>
-                <TableCell>
-                    <Select
-                        value={guest.type}
-                        onChange={(e) => handleGuestChange(guest.id, 'type', e.target.value)}
-                        size="small"
-                        sx={{ minWidth: 100 }}
-                    >
-                        <MenuItem value="Friend">Amigo/a</MenuItem>
-                        <MenuItem value="Family">Familia</MenuItem>
-                    </Select>
+                <TableCell onDoubleClick={() => handleDoubleClick(guest.id, 'type')}>
+                  {editingCell.id === guest.id && editingCell.field === 'type' ? (
+                    renderCell(guest, 'type')
+                  ) : (
+                    <>
+                      <Box sx={{ display: 'block', '@media print': { display: 'none' } }}>
+                        <Select
+                          value={guest.type}
+                          onChange={(e) => handleGuestChange(guest.id, 'type', e.target.value)}
+                          size="small"
+                          sx={{ minWidth: 100 }}
+                        >
+                          <MenuItem value="Friend">Amigo/a</MenuItem>
+                          <MenuItem value="Family">Familia</MenuItem>
+                        </Select>
+                      </Box>
+                      <Box sx={{ display: 'none', '@media print': { display: 'block' } }}>
+                        {renderGuestType(guest.type)}
+                      </Box>
+                    </>
+                  )}
                 </TableCell>
                 <TableCell align="center">
                     <Checkbox
@@ -142,7 +185,7 @@ const GuestListPage = () => {
                         inputProps={{ 'aria-label': 'Is here' }}
                     />
                 </TableCell>
-                <TableCell align="center">
+                <TableCell align="center" sx={{ '@media print': { display: 'none' } }}>
                   <IconButton aria-label="delete" size="small" onClick={() => handleDeleteClick(guest.id)}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
@@ -152,7 +195,7 @@ const GuestListPage = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 2, '@media print': { display: 'none' } }}>
         <Button startIcon={<AddIcon />} onClick={addGuest}>
           Añadir Invitado
         </Button>
@@ -168,7 +211,8 @@ const GuestListPage = () => {
           <Button onClick={handleDeleteConfirm} color="error">Eliminar</Button>
         </DialogActions>
       </Dialog>
-    </Box>
+      </Box>
+    </>
   );
 };
 

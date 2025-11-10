@@ -23,28 +23,56 @@ function PrintPage() {
             display: none;
         }
         @media print {
-          body * {
-            visibility: hidden;
+          /* Hide elements not meant for printing */
+          .no-print {
+            display: none !important;
           }
-          .printable-area, .printable-area * {
-            visibility: visible;
+
+          /* Styles for dedicated print areas (like this component) */
+          .printable-area-container body * {
+            visibility: hidden; /* Hide everything by default */
           }
-          .printable-area {
-            display: block;
+          .printable-area-container .printable-area,
+          .printable-area-container .printable-area * {
+            visibility: visible; /* Only show the printable area and its children */
+          }
+          .printable-area-container .printable-area {
+            position: absolute;
+            left: 0;
+            top: 0;
             width: 100%;
           }
-          /* Reset app layout for printing */
-          #root, #root > div, #root > div > div {
-            display: block !important;
+
+          /* --- GLOBAL PRINT STYLES --- */
+          /* Ensure html and body expand to show all content */
+          html, body {
+            height: auto !important;
             overflow: visible !important;
           }
-          .no-print {
-            display: none;
+          /* Ensure layout containers expand to show all content */
+          #root, #root > div, #root > div > div {
+            height: auto !important;
+            overflow: visible !important;
+            position: static !important; /* Reset any absolute/fixed positioning that might break flow */
+          }
+          /* Ensure tables and their containers expand for printing */
+          .MuiTableContainer-root {
+            overflow: visible !important;
+            height: auto !important;
+            max-height: none !important;
+            box-shadow: none !important;
+          }
+          /* Prevent table body from breaking across pages awkwardly */
+          .MuiTableBody-root {
+            page-break-inside: avoid !important;
+          }
+          table {
+            min-width: 100% !important;
           }
         }
       `}
       </style>
-      <div className="printable-area">
+      <div className="printable-area no-print">
         <Container maxWidth="lg">
           <Typography variant="h4" component="h1" gutterBottom>
             Mi Selección de Proveedores

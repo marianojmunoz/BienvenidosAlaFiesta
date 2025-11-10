@@ -19,7 +19,7 @@ export const GuestListProvider = ({ children }) => {
       id: Date.now(), // Simple unique ID generation
       name: 'Nuevo Invitado',
       qty: 1,
-      hasChildren: 1,
+      hasChildren: 0,
       observations: '',
       table: 0,
       type: 'Friend',

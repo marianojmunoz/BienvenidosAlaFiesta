@@ -44,7 +44,17 @@ function App() {
           <Router>
             <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
               <Header location={location} />
-              <div style={{ flex: 1, overflowY: 'auto' }}>
+              <style>
+                {`
+                  @media print {
+                    .printable-content-area {
+                      overflow-y: visible !important;
+                      height: auto !important;
+                    }
+                  }
+                `}
+              </style>
+              <div className="printable-content-area" style={{ flex: 1, overflowY: 'auto' }}>
                 <Routes>
                   <Route path="/" element={<HomePage onLocationChange={setLocation} onRadiusChange={setRadius} radius={radius} />} />
                   <Route
