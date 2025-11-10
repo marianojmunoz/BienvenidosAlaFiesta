@@ -11,7 +11,7 @@ export const GuestListProvider = ({ children }) => {
   const [guests, setGuests] = useState(initialGuests);
 
   const totalAdults = useMemo(() => {
-    return guests.reduce((total, guest) => total + Number(guest.adults), 0);
+        return guests.reduce((total, guest) => total + Number(guest.adults), 0);
   }, [guests]);
 
   const totalChildren = useMemo(() => {
@@ -24,7 +24,7 @@ export const GuestListProvider = ({ children }) => {
     const newGuest = {
       id: Date.now(), // Simple unique ID generation
       name: 'Nuevo Invitado',
-      qty: 1,
+      qty: 1, // Initialized as 1 adult
       adults: 1,
       hasChildren: 0,
       observations: '',
@@ -42,11 +42,17 @@ export const GuestListProvider = ({ children }) => {
   }, []);
 
   const handleGuestChange = useCallback((id, field, value) => {
-    setGuests(currentGuests =>
-      currentGuests.map(guest =>
-        guest.id === id ? { ...guest, [field]: value } : guest
-      )
-    );
+    setGuests(currentGuests => {
+      return currentGuests.map(guest => {
+        if (guest.id === id) {
+          const updatedGuest = { ...guest, [field]: value };
+          // Automatically update the total quantity when adults or children change
+          updatedGuest.qty = (Number(updatedGuest.adults) || 0) + (Number(updatedGuest.hasChildren) || 0);
+          return updatedGuest;
+        }
+        return guest;
+      });
+    });
   }, []);
 
   const value = useMemo(() => ({

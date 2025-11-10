@@ -126,7 +126,7 @@ const GuestListPage = () => {
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="h6">
-              Total: <Box component="span" sx={{ color: 'red', fontWeight: 'bold'}}>{totalGuests}</Box> (Adultos {totalAdults}, hijos {totalChildren})
+              Total: <Box component="span" sx={{ color: 'red', fontWeight: 'bold' }}>{totalGuests}</Box> (Adultos {totalAdults}, hijos {totalChildren})
             </Typography>
             <Button
               variant="contained"
@@ -176,7 +176,7 @@ const GuestListPage = () => {
                   <TableCell component="th" scope="row" onDoubleClick={() => handleDoubleClick(guest.id, 'name')}>
                     {renderCell(guest, 'name')}
                   </TableCell>
-                  <TableCell align="right"> {(totalGuests)}
+                  <TableCell align="right"> {guest.qty}
                   </TableCell>
                   <TableCell align="center" onDoubleClick={() => handleDoubleClick(guest.id, 'adults')}>
                     {renderCell(guest, 'adults')}
