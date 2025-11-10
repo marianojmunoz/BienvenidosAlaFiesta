@@ -21,7 +21,7 @@ export const GuestListProvider = ({ children }) => {
       qty: 1,
       hasChildren: 0,
       observations: '',
-      table: 0,
+      table: 1,
       type: 'Friend',
       isHere: false,
     };

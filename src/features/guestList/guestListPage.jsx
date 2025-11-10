@@ -4,6 +4,7 @@ import { Box,  Button,  Paper,  Table,  TableBody,  TableCell,  TableContainer, 
 import PrintIcon from '@mui/icons-material/Print';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ExportButton from '../export/ExportButton';
 import { useGuestList } from './GuestListContext';
 
 const GuestListPage = () => {
@@ -13,6 +14,18 @@ const GuestListPage = () => {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const transformGuestDataForExport = (data) => {
+    return data.map(guest => ({
+      'Nombre completo': guest.name,
+      'Cantidad': guest.qty,
+      'Hijos?': guest.hasChildren,
+      'Observaciones': guest.observations,
+      'N° Mesa': guest.table,
+      'Tipo Invitado': renderGuestType(guest.type),
+      'Está aquí?': guest.isHere ? 'Sí' : 'No',
+    }));
   };
 
   const handleDoubleClick = (id, field) => {
@@ -118,6 +131,13 @@ const GuestListPage = () => {
             >
                 Print
             </Button>
+            <ExportButton
+              data={guests}
+              filename="ListaDeInvitados"
+              sheetName="Invitados"
+              transformData={transformGuestDataForExport}
+              sx= {{'@media print': { display: 'none' } }}
+            />
         </Box>
       </Box>
 
