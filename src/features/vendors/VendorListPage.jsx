@@ -7,8 +7,8 @@ import LocationOnIcon from '@mui/icons-material/LocationOn'; // Keep
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCart } from '../cart/cartContext';
-import LocationSelector from '../../components/layout/locationSelector';
-import { getAddressFromCoords } from '../../utils/geolocation';
+import LocationSelector from '../../utils/localization/locationSelector';
+import { getAddressFromCoords } from '../../utils/localization/geolocation';
 
 function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) {
   const { category } = useParams();
@@ -31,6 +31,7 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
     }
 
     const locationQuery = searchLocation.address || `${searchLocation.lat},${searchLocation.lng}`;
+    const url = `https://api.serper.dev/search`;
     const categoryMap = { "Pastelerias": "bakery", "Salones de fiesta": "event venue" };
     const baseQuery = categoryMap[keyword] || keyword;
     const serperQuery = `${baseQuery} within ${searchRadius}km`;
@@ -49,7 +50,15 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
 
     const data = await response.json();
     if (!response.ok || data.error) throw new Error(`Proxy Error: ${data.error || response.statusText}`);
-    return (data.places || []).map(place => ({ id: place.place_id, name: place.title, address: place.address, geocodes: { latitude: place.latitude, longitude: place.longitude }, rating: place.rating || 0, category: keyword })).slice(0, 25);
+    return (data.places || []).map(place => ({
+      // Create a composite ID to ensure uniqueness, as place_id can sometimes be duplicated in results.
+      id: `${place.place_id}-${place.position}`,
+      name: place.title,
+      address: place.address,
+      geocodes: { latitude: place.latitude, longitude: place.longitude },
+      rating: place.rating || 0,
+      category: keyword
+    })).slice(0, 25);
   }, []);
 
   const fetchVendors = useCallback(async () => {

@@ -21,7 +21,7 @@ const PrintButton = ({ ...props }) => {
       sx={{ '@media print': { display: 'none' } }}
       {...props}
     >
-      Print
+      Imprimir
     </Button>
   );
 };

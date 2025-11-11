@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography, CircularProgress, FormControl, InputLabel, Select, MenuItem, IconButton } from '@mui/material';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
-import { getAddressFromCoords, getCoordsFromAddress } from '../../utils/geolocation';
+import { getAddressFromCoords, getCoordsFromAddress } from './geolocation';
 
 function LocationSelector({ onLocationChange, onRadiusChange, radius }) {
   const [manualLocation, setManualLocation] = useState("");
