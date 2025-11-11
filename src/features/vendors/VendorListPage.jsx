@@ -50,8 +50,9 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
 
     const data = await response.json();
     if (!response.ok || data.error) throw new Error(`Proxy Error: ${data.error || response.statusText}`);
+    // Create a composite ID from place_id and position to guarantee uniqueness,
+    // as the API can sometimes return duplicate place_id values in a single search.
     return (data.places || []).map(place => ({
-      // Create a composite ID to ensure uniqueness, as place_id can sometimes be duplicated in results.
       id: `${place.place_id}-${place.position}`,
       name: place.title,
       address: place.address,
@@ -154,7 +155,7 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
           <List disablePadding>
             {vendors.length > 0 ? (
               vendors.map((vendor, index) => (
-                <React.Fragment key={`${vendor.id}-${index}`}>
+                <React.Fragment key={`${vendor.id}-${vendor.category}-${index}`}>
                   <ListItem
                     secondaryAction={
                       <Stack direction="row" spacing={1}>
@@ -174,7 +175,7 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
                           size="small"
                           startIcon={<AddShoppingCartIcon />}
                           onClick={() => addToCart(vendor)}
-                          disabled={cartItems.some(item => item.id === vendor.id)}
+                          disabled={cartItems.some(item => item.id === vendor.id && item.category === vendor.category)}                        
                           aria-label={`Add ${vendor.name} to cart`}
                         >
                           Añadir
