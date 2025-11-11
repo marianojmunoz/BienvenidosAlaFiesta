@@ -10,8 +10,8 @@ export const CartProvider = ({ children, location }) => {
 
   const addToCart = (vendor) => {
     setCartItems((prevItems) => {
-      // Prevent adding duplicates
-      if (prevItems.find((item) => item.id === vendor.id)) {
+      // Prevent adding duplicates based on both id and category
+      if (prevItems.find((item) => item.id === vendor.id && item.category === vendor.category)) {
         return prevItems;
       }
       return [...prevItems, vendor];

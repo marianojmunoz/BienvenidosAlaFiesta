@@ -81,41 +81,32 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
   }, [category, pageTitle, location, radius, searchSerperPlaces]);
 
   useEffect(() => {
-    // On initial mount, try to get the user's location if one isn't already set.
-    // If a location exists, fetch vendors immediately.
-    if (location && location.address) {
-      fetchVendors();
-    } else {
-      setLoading(true); // Start loading while we geolocate
+    // This effect handles both initial geolocation and subsequent vendor fetching.
+    if (!location?.address) {
+      // If no location is set, try to geolocate the user once.
+      setLoading(true);
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
           try {
             const address = await getAddressFromCoords(latitude, longitude);
+            // This will trigger a re-render and the else block below will run.
             onLocationChange({ lat: latitude, lng: longitude, address });
-            // The state update will trigger the next effect to fetch vendors.
           } catch (geoError) {
             setError(geoError.message);
             setLoading(false);
           }
         },
         (err) => {
-          setError(`Error de geolocalización: ${err.message}. Por favor, habilite la geolocalización o busque una ciudad.`);
-          setLoading(false); // Stop loading if geolocation fails
+          setError(`Error de geolocalización: ${err.message}. Por favor, busque una ciudad.`);
+          setLoading(false);
         }
       );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    // This effect will run whenever the location is updated by the user,
-    // but we skip the very first render to avoid a double-fetch.
-    const isInitialMount = !vendors.length && !error;
-    if (!isInitialMount && location && location.lat && location.lng) {
+    } else {
+      // If a location exists, fetch vendors. This runs on subsequent changes too.
       fetchVendors();
     }
-  }, [location]); // Only depends on location
+  }, [category, location, radius, onLocationChange, fetchVendors]); // Re-run if any of these change
 
   // If there's no category, don't attempt to render the rest of the page.
   if (!category) {
@@ -155,7 +146,7 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
           <List disablePadding>
             {vendors.length > 0 ? (
               vendors.map((vendor, index) => (
-                <React.Fragment key={`${vendor.id}-${vendor.category}-${index}`}>
+                <React.Fragment key={`${vendor.id}-${vendor.category}`}>
                   <ListItem
                     secondaryAction={
                       <Stack direction="row" spacing={1}>
@@ -175,7 +166,7 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
                           size="small"
                           startIcon={<AddShoppingCartIcon />}
                           onClick={() => addToCart(vendor)}
-                          disabled={cartItems.some(item => item.id === vendor.id && item.category === vendor.category)}                        
+                          disabled={cartItems.some(item => item.id === vendor.id && item.category === vendor.category)}
                           aria-label={`Add ${vendor.name} to cart`}
                         >
                           Añadir
