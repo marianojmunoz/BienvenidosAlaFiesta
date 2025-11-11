@@ -18,8 +18,11 @@ export const CartProvider = ({ children, location }) => {
     });
   };
 
-  const removeFromCart = (vendorId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== vendorId));
+  const removeFromCart = (vendorToRemove) => {
+    setCartItems((prevItems) =>
+      // Keep items that DO NOT match both the id and category of the item to remove.
+      prevItems.filter(item => !(item.id === vendorToRemove.id && item.category === vendorToRemove.category))
+    );
   };
 
   const removeCategoryFromCart = (categoryName) => {

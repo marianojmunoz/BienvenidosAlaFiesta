@@ -74,7 +74,7 @@ function CartPage() {
                 <React.Fragment key={vendor.id}>
                   <ListItem
                     secondaryAction={
-                      <IconButton edge="end" aria-label="delete" onClick={() => removeFromCart(vendor.id)}>
+                      <IconButton edge="end" aria-label="delete" onClick={() => removeFromCart(vendor)}>
                         <DeleteIcon />
                       </IconButton>
                     }
