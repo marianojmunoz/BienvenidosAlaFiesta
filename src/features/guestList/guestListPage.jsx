@@ -138,6 +138,7 @@ const GuestListPage = () => {
               startIcon={<PrintIcon />}
               onClick={handlePrint}
               sx={{ '@media print': { display: 'none' } }}
+              disabled={guests.length === 0}
             >
               Print
             </Button>

@@ -1,4 +1,4 @@
-// src/components/layout/CategoryCard.jsx
+// src/components/layout/categoryCard.jsx
 import React from 'react';
 import { Grid, Paper, Typography, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
