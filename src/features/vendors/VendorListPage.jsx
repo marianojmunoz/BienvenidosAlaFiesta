@@ -1,4 +1,4 @@
-// src/pages/VendorListPage.jsx
+// src/pages/vendorListPage.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import { categories } from '../../data/categories';
@@ -6,8 +6,8 @@ import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, Li
 import LocationOnIcon from '@mui/icons-material/LocationOn'; // Keep
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useCart } from '../cart/CartContext';
-import LocationSelector from '../../components/layout/LocationSelector';
+import { useCart } from '../cart/cartContext';
+import LocationSelector from '../../components/layout/locationSelector';
 import { getAddressFromCoords } from '../../utils/geolocation';
 
 function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) {

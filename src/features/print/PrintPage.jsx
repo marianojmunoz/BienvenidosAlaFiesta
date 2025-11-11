@@ -1,7 +1,7 @@
-// src/features/print/PrintPage.jsx
+// src/features/print/printPage.jsx
 import React from "react";
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { useCart } from '../cart/CartContext';
+import { useCart } from '../cart/cartContext';
 
 function PrintPage() {
   const { cartItems, getCategoryForVendor } = useCart();

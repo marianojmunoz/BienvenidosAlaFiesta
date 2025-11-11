@@ -4,11 +4,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import CartPage from './features/cart/CartPage';
 import VendorListPage from './features/vendors/VendorListPage';
-import Header from './components/layout/Header';
+import Header from './components/layout/header';
 import GuestListPage from './features/guestList/guestListPage';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import { GuestListProvider } from './features/guestList/GuestListContext';
-import { CartProvider } from './features/cart/CartContext';
+import { GuestListProvider } from './features/guestList/guestListContext';
+import { CartProvider } from './features/cart/cartContext';
 
 const theme = createTheme({
   palette: {

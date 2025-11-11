@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography,
   Checkbox, Select, MenuItem, IconButton, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
@@ -6,8 +7,9 @@ import {
 import PrintIcon from '@mui/icons-material/Print';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ExportButton from '../export/ExportButton';
-import { useGuestList } from './GuestListContext';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ExportButton from '../export/exportButton';
+import { useGuestList } from './guestListContext';
 
 const GuestListPage = () => {
   const { guests, totalGuests, totalAdults, totalChildren, handleGuestChange, addGuest, deleteGuest } = useGuestList();
@@ -121,9 +123,12 @@ const GuestListPage = () => {
         }
       }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, '@media print': { padding: '20px' } }}>
-          <Typography variant="h4">
-            Lista de Invitados
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton component={RouterLink} to="/" sx={{ mr: 2, '@media print': { display: 'none' } }}>
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h4">Lista de Invitados</Typography>
+          </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="h6">
               Total: <Box component="span" sx={{ color: 'red', fontWeight: 'bold' }}>{totalGuests}</Box> (Adultos {totalAdults}, hijos {totalChildren})

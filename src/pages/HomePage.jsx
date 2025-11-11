@@ -3,8 +3,8 @@ import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Container, Typography, Grid, Box } from '@mui/material';
 import { categories } from '../data/categories';
-import LocationSelector from '../components/layout/LocationSelector';
-import CategoryCard from '../components/layout/CategoryCard';
+import LocationSelector from '../components/layout/locationSelector';
+import CategoryCard from '../components/layout/categoryCard';
 
 function HomePage({ onLocationChange, onRadiusChange, radius }) {
   return (

@@ -46,7 +46,6 @@ export const GuestListProvider = ({ children }) => {
       return currentGuests.map(guest => {
         if (guest.id === id) {
           const updatedGuest = { ...guest, [field]: value };
-          // Automatically update the total quantity when adults or children change
           updatedGuest.qty = (Number(updatedGuest.adults) || 0) + (Number(updatedGuest.hasChildren) || 0);
           return updatedGuest;
         }
