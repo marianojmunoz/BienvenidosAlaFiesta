@@ -40,8 +40,8 @@ function CartPage() {
 
   return (
     <>
-      <Container maxWidth="lg" className="no-print">
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+      <Container maxWidth="lg">
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }} className="no-print">
           <IconButton component={RouterLink} to="/" sx={{ mr: 2 }}>
             <ArrowBackIcon />
           </IconButton>
@@ -59,12 +59,13 @@ function CartPage() {
         {Object.entries(groupedByCategory).map(([category, vendors]) => (
           <Paper elevation={3} sx={{ mb: 4 }} key={category}>
             <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'primary.main', color: 'primary.contrastText' }}>
-              <Typography variant="h5">{category}</Typography>
+              <Typography variant="h5">{`${category} (${vendors.length})`}</Typography>
               <Button
                 variant="contained"
                 color="secondary"
                 startIcon={<DeleteIcon />}
                 onClick={() => removeCategoryFromCart(category)}
+                className="no-print"
               >
                 Eliminar Categoría
               </Button>
@@ -74,7 +75,7 @@ function CartPage() {
                 <React.Fragment key={vendor.id}>
                   <ListItem
                     secondaryAction={
-                      <IconButton edge="end" aria-label="delete" onClick={() => removeFromCart(vendor)}>
+                      <IconButton edge="end" aria-label="delete" onClick={() => removeFromCart(vendor)} className="no-print">
                         <DeleteIcon />
                       </IconButton>
                     }
