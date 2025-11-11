@@ -7,7 +7,7 @@ import GuestListIcon from '../../features/guestList/guestListIcon';
 
 function Header() {
   return (
-    <AppBar position="static" sx={{ mb: 4 }}>
+    <AppBar position="static" sx={{ mb: 4 }} className="no-print-header">
       <Toolbar>
         <Typography variant="h6" component={RouterLink} to="/" sx={{ flexGrow: 1, color: 'inherit', textDecoration: 'none' }}>
           Bienvenidos a la Fiesta!!

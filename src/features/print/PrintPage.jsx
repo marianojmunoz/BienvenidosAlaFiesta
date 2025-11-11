@@ -1,4 +1,4 @@
-// src/features/print/printPage.jsx
+// src/features/print/PrintPage.jsx
 import React from "react";
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { useCart } from '../cart/cartContext';
@@ -44,27 +44,29 @@ function PrintPage() {
           }
 
           /* --- GLOBAL PRINT STYLES --- */
-          /* Ensure html and body expand to show all content */
-          html, body {
-            height: auto !important;
-            overflow: visible !important;
-          }
-          /* Ensure layout containers expand to show all content */
-          #root, #root > div, #root > div > div {
-            height: auto !important;
-            overflow: visible !important;
-            position: static !important; /* Reset any absolute/fixed positioning that might break flow */
-          }
-          /* Ensure tables and their containers expand for printing */
-          .MuiTableContainer-root {
-            overflow: visible !important;
-            height: auto !important;
-            max-height: none !important;
-            box-shadow: none !important;
-          }
-          /* Prevent table body from breaking across pages awkwardly */
-          .MuiTableBody-root {
-            page-break-inside: avoid !important;
+          body.printable-area-container {
+            /* Ensure html and body expand to show all content */
+            &, html {
+              height: auto !important;
+              overflow: visible !important;
+            }
+            /* Ensure layout containers expand to show all content */
+            #root, #root > div, #root > div > div {
+              height: auto !important;
+              overflow: visible !important;
+              position: static !important; /* Reset any absolute/fixed positioning that might break flow */
+            }
+            /* Ensure tables and their containers expand for printing */
+            .MuiTableContainer-root {
+              overflow: visible !important;
+              height: auto !important;
+              max-height: none !important;
+              box-shadow: none !important;
+            }
+            /* Prevent table body from breaking across pages awkwardly */
+            .MuiTableBody-root {
+              page-break-inside: avoid !important;
+            }
           }
           table {
             min-width: 100% !important;

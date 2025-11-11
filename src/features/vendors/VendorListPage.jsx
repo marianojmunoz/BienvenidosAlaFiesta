@@ -31,7 +31,6 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
     }
 
     const locationQuery = searchLocation.address || `${searchLocation.lat},${searchLocation.lng}`;
-    const url = `https://api.serper.dev/search`;
     const categoryMap = { "Pastelerias": "bakery", "Salones de fiesta": "event venue" };
     const baseQuery = categoryMap[keyword] || keyword;
     const serperQuery = `${baseQuery} within ${searchRadius}km`;

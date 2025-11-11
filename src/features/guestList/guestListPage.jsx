@@ -4,21 +4,17 @@ import {
   Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography,
   Checkbox, Select, MenuItem, IconButton, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
 } from '@mui/material';
-import PrintIcon from '@mui/icons-material/Print';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ExportButton from '../export/exportButton';
 import { useGuestList } from './guestListContext';
+import PrintButton from '../print/printButton';
 
 const GuestListPage = () => {
   const { guests, totalGuests, totalAdults, totalChildren, handleGuestChange, addGuest, deleteGuest } = useGuestList();
   const [editingCell, setEditingCell] = useState({ id: null, field: null });
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   const transformGuestDataForExport = (data) => {
     return data.map(guest => ({
@@ -112,6 +108,9 @@ const GuestListPage = () => {
           @page {
             size: auto;
           }
+          .no-print-header {
+            display: none !important;
+          }
         `}
       </style>
       <Box sx={{
@@ -133,15 +132,7 @@ const GuestListPage = () => {
             <Typography variant="h6">
               Total: <Box component="span" sx={{ color: 'red', fontWeight: 'bold' }}>{totalGuests}</Box> (Adultos {totalAdults}, hijos {totalChildren})
             </Typography>
-            <Button
-              variant="contained"
-              startIcon={<PrintIcon />}
-              onClick={handlePrint}
-              sx={{ '@media print': { display: 'none' } }}
-              disabled={guests.length === 0}
-            >
-              Print
-            </Button>
+            <PrintButton />
             <ExportButton
               data={guests}
               filename="ListaDeInvitados"
