@@ -17,12 +17,10 @@ const _callGeocodingApi = async (query) => {
   const response = await fetch(url);
   const data = await response.json();
 
-  // Check for a successful OpenCage API response
   if (data.status && data.status.code === 200 && data.results && data.results.length > 0) {
     return data;
   }
 
-  // Provide a more detailed error message from the API if available
   if (data.status && data.status.message) {
     throw new Error(`Error de geocodificación: ${data.status.message}`);
   }
@@ -41,7 +39,21 @@ const _callGeocodingApi = async (query) => {
 export const getAddressFromCoords = async (lat, lng) => {
   const query = `${lat}+${lng}`;
   const data = await _callGeocodingApi(query);
-  return data.results[0].formatted;
+  //console.log("getAddressFromCoords", data);
+
+  const components = data.results[0].components;
+  //const road = components.road;
+  // Use common alternatives for city if 'city' is not directly available
+  const city = components.city || components.town || components.village;
+  const state = components.state;
+
+  let addressParts = [];
+  //if (road) addressParts.push(road);
+  if (city) addressParts.push(city);
+  if (state) addressParts.push(state);
+
+  // If specific components could be extracted, join them. Otherwise, fall back to the original formatted string.
+  return addressParts.length > 0 ? addressParts.join(', ') : data.results[0].formatted;
 };
 
 /**
@@ -53,8 +65,18 @@ export const getAddressFromCoords = async (lat, lng) => {
 export const getCoordsFromAddress = async (address) => {
   const query = encodeURIComponent(address);
   const data = await _callGeocodingApi(query);
+
+  const components = data.results[0].components;
+  const city = components.city || components.town || components.village;
+  const state = components.state;
+
+  let addressParts = [];
+  if(city) addressParts.push(city);
+  if(state) addressParts.push(state);
+
+  //console.log("getCoordsFromAddress", data);
   return {
     ...data.results[0].geometry,
-    formatted: data.results[0].formatted,
+    address: addressParts.length > 0 ? addressParts.join(', ') : data.results[0].formatted
   };
 };

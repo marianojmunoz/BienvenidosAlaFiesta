@@ -18,12 +18,10 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
 
   const { addToCart, cartItems } = useCart();
 
-  // Find the category object from our data to get the proper name for the title
   const categoryDetails = categories.find(c => c.url === category);
   const pageTitle = categoryDetails ? categoryDetails.name : 'Proveedores';
 
   const searchSerperPlaces = useCallback(async (keyword, searchLocation, searchRadius) => {
-    // No need for API key on the client-side when using a proxy
 
     if (!searchLocation || !searchLocation.lat || !searchLocation.lng) {
       console.error("Location data is incomplete for search.");

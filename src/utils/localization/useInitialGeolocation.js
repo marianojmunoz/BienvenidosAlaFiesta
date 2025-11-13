@@ -14,13 +14,11 @@ import { getAddressFromCoords } from './geolocation';
  */
 export const useInitialGeolocation = ({ location, onLocationChange, onSuccess, onError, setLoading }) => {
   useEffect(() => {
-    // If a location with an address already exists, just run the success callback (e.g., fetch vendors).
     if (location && location.address) {
       onSuccess();
       return;
     }
 
-    // If geolocation is not supported, do nothing.
     if (!navigator.geolocation) {
       return;
     }
@@ -32,7 +30,6 @@ export const useInitialGeolocation = ({ location, onLocationChange, onSuccess, o
         try {
           const address = await getAddressFromCoords(latitude, longitude);
           onLocationChange({ lat: latitude, lng: longitude, address });
-          // The onSuccess callback will be triggered by the location change in the parent component.
         } catch (geoError) {
           onError(geoError.message);
           setLoading(false);
@@ -43,7 +40,5 @@ export const useInitialGeolocation = ({ location, onLocationChange, onSuccess, o
         setLoading(false);
       }
     );
-    // We only want this to run once on mount, so we pass an empty dependency array.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };

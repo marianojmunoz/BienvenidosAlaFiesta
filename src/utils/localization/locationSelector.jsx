@@ -83,8 +83,9 @@ function LocationSelector({ onLocationChange, onRadiusChange, radius }) {
     <Box sx={{ my: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
         {loading && <CircularProgress size={24} />}
-        {!loading && (
-          <Typography variant="body2" color="text.secondary">Ingresa una Localidad o usa la geolocalización actual.</Typography>
+        {!loading && currentLocation &&(
+          <Typography variant="body2" color='text.secondary' sx={{mt: 1}}>Ubicación: {currentLocation}
+          </Typography>
         )}
         <form onSubmit={handleManualSubmit} style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
           <TextField label="Ingresar ubicación" variant="outlined" size="small" value={manualLocation} onChange={(e) => setManualLocation(e.target.value)} />
@@ -107,8 +108,7 @@ function LocationSelector({ onLocationChange, onRadiusChange, radius }) {
           </Select>
         </FormControl>
       </Box>
-      {error && <Typography color="error" variant="body2" sx={{ mt: 1 }}>{error}</Typography>}
-      {currentLocation && <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>Ubicación actual: {currentLocation}</Typography>}
+      {error && <Typography color="error" variant="body2" sx={{ mt: 1 }}>{error}</Typography>}      
     </Box>
   );
 }
