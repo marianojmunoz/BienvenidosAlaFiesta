@@ -7,42 +7,28 @@ import VendorListPage from './features/vendors/VendorListPage';
 import Header from './components/layout/header';
 import GuestListPage from './features/guestList/guestListPage';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import { GuestListProvider } from './features/guestList/guestListContext';
+import { GuestListProvider } from './features/guestList/GuestListContext';
 import { CartProvider } from './features/cart/cartContext';
 
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: { main: '#673ab7' },
-    secondary: { main: '#f50057' },
-    background: { default: '#f4f5f7' },
-  },
-  typography: {
-    fontFamily: 'Poppins, Roboto, Arial, sans-serif',
-    h1: { fontWeight: 700 },
-    h2: { fontWeight: 700 },
-    h3: { fontWeight: 600 },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: { borderRadius: 8, textTransform: 'none' },
-      },
-    },
-  },
-});
+import { glassTheme } from './theme/glassTheme';
 
 function App() {
-  const [location, setLocation] = useState({ lat: 40.7128, lng: -74.0060, address: 'New York, NY' });
+  const [location, setLocation] = useState({ lat: -31.7909843, lng: -60.4380765, address: 'Buenos Aires, Argentina' });
   const [radius, setRadius] = useState(10); // Default radius in km
 
   return (
     <CartProvider>
       <GuestListProvider>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={glassTheme}>
           <CssBaseline />
           <Router>
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100vh',
+              background: 'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)', // Global gradient
+              backgroundAttachment: 'fixed'
+            }}>
               <Header location={location} />
               <style>
                 {`

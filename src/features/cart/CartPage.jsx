@@ -2,14 +2,14 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useCart } from './cartContext';
-import { Container, Typography, Box, List, ListItem, ListItemText, IconButton, Button, Paper, Divider} from '@mui/material';
+import { Container, Typography, Box, List, ListItem, ListItemText, IconButton, Button, Paper, Divider } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PrintIcon from '@mui/icons-material/Print';
 import PrintPage from '../print/printPage';
 
 function CartPage() {
-    const { cartItems, removeFromCart, removeCategoryFromCart, getCategoryForVendor } = useCart();
+  const { cartItems, removeFromCart, removeCategoryFromCart, getCategoryForVendor } = useCart();
 
   const groupedByCategory = cartItems.reduce((acc, vendor) => {
     const category = getCategoryForVendor(vendor);
@@ -57,15 +57,35 @@ function CartPage() {
           </Button>
         </Box>
         {Object.entries(groupedByCategory).map(([category, vendors]) => (
-          <Paper elevation={3} sx={{ mb: 4 }} key={category}>
-            <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'primary.main', color: 'primary.contrastText' }}>
-              <Typography variant="h5">{`${category} (${vendors.length})`}</Typography>
+          <Paper
+            elevation={3}
+            sx={{
+              mb: 4,
+              borderRadius: 4,
+              background: 'rgba(255, 255, 255, 0.6)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              overflow: 'hidden'
+            }}
+            key={category}
+          >
+            <Box sx={{
+              p: 2,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'linear-gradient(90deg, rgba(138, 43, 226, 0.8) 0%, rgba(255, 20, 147, 0.8) 100%)',
+              color: 'white'
+            }}>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>{`${category} (${vendors.length})`}</Typography>
               <Button
-                variant="contained"
-                color="secondary"
+                variant="outlined"
+                color="inherit"
+                size="small"
                 startIcon={<DeleteIcon />}
                 onClick={() => removeCategoryFromCart(category)}
                 className="no-print"
+                sx={{ borderColor: 'rgba(255,255,255,0.5)', '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' } }}
               >
                 Eliminar Categoría
               </Button>
@@ -75,17 +95,18 @@ function CartPage() {
                 <React.Fragment key={vendor.id}>
                   <ListItem
                     secondaryAction={
-                      <IconButton edge="end" aria-label="delete" onClick={() => removeFromCart(vendor)} className="no-print">
+                      <IconButton edge="end" aria-label="delete" onClick={() => removeFromCart(vendor)} className="no-print" color="error">
                         <DeleteIcon />
                       </IconButton>
                     }
+                    sx={{ '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' } }}
                   >
                     <ListItemText
-                      primary={vendor.name}
+                      primary={<Typography variant="subtitle1" sx={{ fontWeight: 500 }}>{vendor.name}</Typography>}
                       secondary={vendor.address}
                     />
                   </ListItem>
-                  {index < vendors.length - 1 && <Divider component="li" />}
+                  {index < vendors.length - 1 && <Divider component="li" sx={{ borderColor: 'rgba(0,0,0,0.05)' }} />}
                 </React.Fragment>
               ))}
             </List>

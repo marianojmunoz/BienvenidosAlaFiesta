@@ -1,14 +1,16 @@
-// src/pages/vendorListPage.jsx
+// src/features/vendors/VendorListPage.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import { categories } from '../../data/categories';
-import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Paper, Button, IconButton, Divider, Stack, Rating, Collapse } from '@mui/material';
-import LocationOnIcon from '@mui/icons-material/LocationOn'; // Keep
+import { Container, Typography, Box, CircularProgress, Alert, List, ListItem, ListItemText, Paper, Button, IconButton, Divider, Stack, Rating, Collapse, Chip } from '@mui/material';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import { useCart } from '../cart/cartContext';
 import LocationSelector from '../../utils/localization/locationSelector';
-import { getAddressFromCoords } from '../../utils/localization/geolocation';
+import { searchVendorsByLocation } from '../../utils/localization/geolocation';
+import { getDistanceFromLatLonInKm } from '../../utils/distance';
 
 function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) {
   const { category } = useParams();
@@ -21,92 +23,52 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
   const categoryDetails = categories.find(c => c.url === category);
   const pageTitle = categoryDetails ? categoryDetails.name : 'Proveedores';
 
-  const searchSerperPlaces = useCallback(async (keyword, searchLocation, searchRadius) => {
-
-    if (!searchLocation || !searchLocation.lat || !searchLocation.lng) {
-      console.error("Location data is incomplete for search.");
-      throw new Error("La configuración para buscar proveedores no está completa. Por favor, contacta al administrador.");
-    }
-
-    const locationQuery = searchLocation.address || `${searchLocation.lat},${searchLocation.lng}`;
-    const url = `https://api.serper.dev/search`;
-    const categoryMap = { "Pastelerias": "bakery", "Salones de fiesta": "event venue" };
-    const baseQuery = categoryMap[keyword] || keyword;
-    const serperQuery = `${baseQuery} within ${searchRadius}km`;
-
-    // Call your backend proxy instead of the Serper API directly
-    const proxyUrl = `http://localhost:3001/api/search-vendors`; // Adjust port if your backend is different
-    const response = await fetch(proxyUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        // The API key is now sent by the proxy server, so it's removed from the client-side call.
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ q: serperQuery, location: locationQuery, type: "places", num: 25 })
-    });
-
-    const data = await response.json();
-    if (!response.ok || data.error) throw new Error(`Proxy Error: ${data.error || response.statusText}`);
-    // Create a composite ID from place_id and position to guarantee uniqueness,
-    // as the API can sometimes return duplicate place_id values in a single search.
-    return (data.places || []).map(place => ({
-      id: `${place.place_id}-${place.position}`,
-      name: place.title,
-      address: place.address,
-      geocodes: { latitude: place.latitude, longitude: place.longitude },
-      rating: place.rating || 0,
-      category: keyword
-    })).slice(0, 25);
-  }, []);
-
   const fetchVendors = useCallback(async () => {
     if (!category) {
-      // If there's no category, ensure we aren't stuck in a loading state.
       setLoading(false);
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const data = await searchSerperPlaces(pageTitle, location, radius);
-      setVendors(data);
+      const data = await searchVendorsByLocation(categoryDetails.url, location, radius);
+      // Calculate distance for each vendor
+      const vendorsWithDistance = data.map(vendor => {
+        let distance = null;
+        if (location?.lat && location?.lng && vendor.geocodes?.latitude && vendor.geocodes?.longitude) {
+          distance = getDistanceFromLatLonInKm(
+            location.lat,
+            location.lng,
+            vendor.geocodes.latitude,
+            vendor.geocodes.longitude
+          );
+        }
+        return { ...vendor, distance };
+      });
+
+      // Filter by radius - only show vendors within the selected distance
+      const filteredVendors = vendorsWithDistance.filter(vendor =>
+        vendor.distance !== null && vendor.distance <= radius
+      );
+
+      // Sort by distance if available
+      filteredVendors.sort((a, b) => (a.distance || 9999) - (b.distance || 9999));
+
+      setVendors(filteredVendors);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [category, pageTitle, location, radius, searchSerperPlaces]);
+  }, [category, categoryDetails, location, radius]);
 
   useEffect(() => {
-    // This effect handles both initial geolocation and subsequent vendor fetching.
-    if (!location?.address) {
-      // If no location is set, try to geolocate the user once.
-      setLoading(true);
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          try {
-            const address = await getAddressFromCoords(latitude, longitude);
-            // This will trigger a re-render and the else block below will run.
-            onLocationChange({ lat: latitude, lng: longitude, address });
-          } catch (geoError) {
-            setError(geoError.message);
-            setLoading(false);
-          }
-        },
-        (err) => {
-          setError(`Error de geolocalización: ${err.message}. Por favor, busque una ciudad.`);
-          setLoading(false);
-        }
-      );
-    } else {
-      // If a location exists, fetch vendors. This runs on subsequent changes too.
+    if (location?.lat && location?.lng) {
+      setVendors([]); // Clear previous results
       fetchVendors();
     }
-  }, [category, location, radius, onLocationChange, fetchVendors]); // Re-run if any of these change
+  }, [location, radius, fetchVendors]);
 
-  // If there's no category, don't attempt to render the rest of the page.
   if (!category) {
     return <Alert severity="warning">No category selected. Please go back to the homepage and select a category.</Alert>;
   }
@@ -115,17 +77,19 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap' }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton component={RouterLink} to="/" sx={{ mr: 2 }}>
+          <IconButton component={RouterLink} to="/" sx={{ mr: 2, bgcolor: 'rgba(255,255,255,0.5)' }}>
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h3" component="h1">
+          <Typography variant="h3" component="h1" sx={{ fontWeight: 700, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
             {pageTitle}
           </Typography>
         </Box>
       </Box>
 
       <Collapse in={!loading} sx={{ mb: 4 }}>
-        <LocationSelector onLocationChange={onLocationChange} onRadiusChange={onRadiusChange} radius={radius} location={location} />
+        <Paper sx={{ p: 2, borderRadius: 4, background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(10px)' }}>
+          <LocationSelector onLocationChange={onLocationChange} onRadiusChange={onRadiusChange} radius={radius} location={location} />
+        </Paper>
       </Collapse>
 
       {error && (
@@ -140,61 +104,89 @@ function VendorListPage({ location, radius, onLocationChange, onRadiusChange }) 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}><CircularProgress /></Box>
       ) : (
-        <Paper elevation={3}>
-          <List disablePadding>
-            {vendors.length > 0 ? (
-              vendors.map((vendor, index) => (
-                <React.Fragment key={`${vendor.id}-${vendor.category}`}>
-                  <ListItem
-                    secondaryAction={
-                      <Stack direction="row" spacing={1}>
-                        <Button
+        <Stack spacing={2}>
+          {vendors.length > 0 ? (
+            vendors.map((vendor) => (
+              <Paper
+                key={`${vendor.id}-${vendor.category}`}
+                elevation={0}
+                sx={{
+                  p: 3,
+                  borderRadius: 4,
+                  background: 'rgba(255, 255, 255, 0.6)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  transition: 'transform 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    background: 'rgba(255, 255, 255, 0.75)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.05)'
+                  }
+                }}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+                        {vendor.name}
+                      </Typography>
+                      {vendor.distance !== null && (
+                        <Chip
+                          icon={<DirectionsCarIcon sx={{ fontSize: 16 }} />}
+                          label={`${vendor.distance} km`}
+                          size="small"
+                          color="primary"
                           variant="outlined"
-                          size="small"
-                          startIcon={<LocationOnIcon />}
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(vendor.address)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`View ${vendor.name} on map`}
-                        >
-                          Mapa
-                        </Button>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          startIcon={<AddShoppingCartIcon />}
-                          onClick={() => addToCart(vendor)}
-                          disabled={cartItems.some(item => item.id === vendor.id && item.category === vendor.category)}
-                          aria-label={`Add ${vendor.name} to cart`}
-                        >
-                          Añadir
-                        </Button>
-                      </Stack>
-                    }
-                  >
-                    <ListItemText
-                      primary={vendor.name}
-                      secondary={
-                        <>
-                          <Typography component="span" variant="body2" color="text.primary" display="block">
-                            {vendor.address}
-                          </Typography>
-                          {vendor.rating > 0 && (
-                            <Rating name="read-only" value={vendor.rating} precision={0.5} readOnly size="small" />
-                          )}
-                        </>
-                      }
-                      primaryTypographyProps={{ variant: 'h6', component: 'p' }}
-                    />
-                  </ListItem>
-                  {index < vendors.length - 1 && <Divider component="li" />}
-                </React.Fragment>
-              ))
-            ) : (
-              !error && <ListItem><ListItemText primary={"No se encontraron proveedores para esta categoría."} /></ListItem>
-            )}
-          </List>
-        </Paper>
+                          sx={{ height: 24, bgcolor: 'rgba(138, 43, 226, 0.1)', border: 'none' }}
+                        />
+                      )}
+                    </Box>
+
+                    <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                      <LocationOnIcon fontSize="small" color="action" />
+                      {vendor.address}
+                    </Typography>
+
+                    {vendor.rating > 0 && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Rating name="read-only" value={vendor.rating} precision={0.5} readOnly size="small" />
+                        <Typography variant="caption" color="text.secondary">({vendor.rating})</Typography>
+                      </Box>
+                    )}
+                  </Box>
+
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<LocationOnIcon />}
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${vendor.name} ${vendor.address}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{ borderRadius: 2 }}
+                    >
+                      Mapa
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<AddShoppingCartIcon />}
+                      onClick={() => addToCart(vendor)}
+                      disabled={cartItems.some(item => item.id === vendor.id && item.category === vendor.category)}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      {cartItems.some(item => item.id === vendor.id && item.category === vendor.category) ? 'Añadido' : 'Añadir'}
+                    </Button>
+                  </Stack>
+                </Box>
+              </Paper>
+            ))
+          ) : (
+            !error && <Paper sx={{ p: 4, textAlign: 'center', background: 'rgba(255,255,255,0.5)' }}>
+              <Typography>No se encontraron proveedores cercanos para esta categoría.</Typography>
+            </Paper>
+          )}
+        </Stack>
       )}
     </Container>
   );
